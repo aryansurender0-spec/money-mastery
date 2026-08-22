@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Ledger — Money Mastery</title>
+<meta name="author" content="Aryan Surender">
+<meta name="google-site-verification" content="GWvLh0rHzCVJuFDQTdGs4gyShVZwAYoIzrYeW1NDYwo" />
+<meta name="description" content="An interactive, level-by-level guide to earning, saving, investing, and compounding money — with insights from finance's classic books and the world's top investors.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0E1B14;
+  --surface:#16261C;
+  --surface-2:#1D3226;
+  --paper:#EDE6D6;
+  --paper-dim:#DDD3BD;
+  --gold:#C9A24B;
+  --gold-bright:#E4C171;
+  --jade:#5C9179;
+  --jade-dim:#3C6350;
+  --ivory:#F4EFE3;
+  --ink-on-paper:#1B2A20;
+  --danger:#B85C4A;
+  --line: rgba(237,230,214,0.14);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--ink);
+  color:var(--ivory);
+  font-family:'Inter',sans-serif;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:'Fraunces',serif; font-weight:600; margin:0 0 .4em;}
+.mono{font-family:'IBM Plex Mono',monospace;}
+a{color:var(--gold-bright);}
+::selection{background:var(--gold); color:var(--ink);}
+
+/* ===== HEADER / LEDGER TICKER ===== */
+header.top{
+  position:sticky; top:0; z-index:50;
+  background:linear-gradient(180deg,var(--ink) 80%, rgba(14,27,20,0));
+  backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--line);
+  padding:14px 24px 10px;
+}
+.top-row{display:flex; align-items:center; justify-content:space-between; gap:16px; max-width:1180px; margin:0 auto;}
+.brand{display:flex; align-items:center; gap:10px;}
+.brand .seal{
+  width:38px; height:38px; border-radius:50%;
+  border:1.5px solid var(--gold);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Fraunces',serif; font-weight:700; color:var(--gold-bright); font-size:15px;
+  flex-shrink:0;
+}
+.brand h1{font-size:19px; letter-spacing:.02em; margin:0;}
+.brand .tag{font-size:11px; color:var(--paper-dim); text-transform:uppercase; letter-spacing:.14em; margin-top:1px;}
+
+.ticker{
+  text-align:right; font-family:'IBM Plex Mono',monospace;
+}
+.ticker .label{font-size:10px; text-transform:uppercase; letter-spacing:.14em; color:var(--paper-dim);}
+.ticker .amount{font-size:22px; color:var(--gold-bright); font-weight:600; transition:color .3s;}
+.ticker .amount.grew{color:var(--jade);}
+
+nav.levels{
+  max-width:1180px; margin:14px auto 0; display:flex; gap:6px; overflow-x:auto; padding-bottom:2px;
+}
+nav.levels button{
+  background:transparent; border:1px solid var(--line); color:var(--paper-dim);
+  padding:8px 14px; border-radius:20px; font-family:'Inter',sans-serif; font-size:13px;
+  cursor:pointer; white-space:nowrap; transition:all .2s; display:flex; align-items:center; gap:7px;
+}
+nav.levels button .dot{width:6px;height:6px;border-radius:50%;background:var(--line);}
+nav.levels button.active{background:var(--gold); color:var(--ink); border-color:var(--gold); font-weight:600;}
+nav.levels button.active .dot{background:var(--ink);}
+nav.levels button.done .dot{background:var(--jade);}
+nav.levels button:hover:not(.active){border-color:var(--gold); color:var(--ivory);}
+
+.progress-rail{max-width:1180px; margin:10px auto 0; height:3px; background:var(--surface-2); border-radius:2px; overflow:hidden;}
+.progress-fill{height:100%; background:linear-gradient(90deg,var(--jade),var(--gold)); width:20%; transition:width .4s;}
+
+/* ===== LAYOUT ===== */
+main{max-width:880px; margin:0 auto; padding:40px 24px 100px;}
+.level-section{display:none;}
+.level-section.active{display:block; animation:fadeUp .5s ease both;}
+@keyframes fadeUp{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);}}
+
+.level-header{margin-bottom:36px; padding-bottom:20px; border-bottom:1px solid var(--line);}
+.level-eyebrow{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--gold-bright); text-transform:uppercase; letter-spacing:.14em; margin-bottom:8px;}
+.level-header h2{font-size:34px; line-height:1.15;}
+.level-header p.dek{color:var(--paper-dim); font-size:16px; max-width:60ch; margin-top:6px;}
+
+.chapter{margin-bottom:44px;}
+.chapter h3{font-size:22px; color:var(--paper); margin-bottom:10px; display:flex; align-items:baseline; gap:10px;}
+.chapter h3 .num{font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--gold); font-weight:500;}
+.chapter p{margin:0 0 14px; color:#D9D2C4; font-size:15.5px;}
+.chapter ul{margin:0 0 14px; padding-left:20px; color:#D9D2C4; font-size:15.5px;}
+.chapter li{margin-bottom:6px;}
+.chapter strong{color:var(--ivory);}
+
+/* term tooltip */
+.term{border-bottom:1.5px dotted var(--gold); cursor:help; position:relative; color:var(--gold-bright); font-weight:500;}
+.term .def{
+  display:none; position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%);
+  background:var(--paper); color:var(--ink-on-paper); padding:10px 13px; border-radius:8px;
+  font-family:'Inter',sans-serif; font-size:13px; font-weight:400; line-height:1.45; width:240px;
+  box-shadow:0 8px 24px rgba(0,0,0,.4); z-index:20; border-bottom:none;
+}
+.term .def::after{content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%); border:6px solid transparent; border-top-color:var(--paper);}
+.term:hover .def, .term:focus .def{display:block;}
+
+/* quote / book cards */
+.card-row{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:20px 0 30px;}
+@media(max-width:640px){.card-row{grid-template-columns:1fr;}}
+.quote-card{
+  background:var(--paper); color:var(--ink-on-paper); border-radius:10px; padding:20px 22px;
+  position:relative; overflow:hidden;
+}
+.quote-card::before{content:'"'; position:absolute; top:-18px; right:8px; font-family:'Fraunces',serif; font-size:90px; color:rgba(27,42,32,0.08);}
+.quote-card p.q{font-family:'Fraunces',serif; font-size:16px; font-style:italic; margin:0 0 10px; line-height:1.4; position:relative;}
+.quote-card p.who{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--jade-dim); text-transform:uppercase; letter-spacing:.08em;}
+.quote-card p.insight{font-size:13px; color:#4a4438; margin-top:8px; padding-top:8px; border-top:1px solid rgba(27,42,32,.12);}
+
+.book-card{
+  background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:20px 22px;
+  border-left:3px solid var(--jade);
+}
+.book-card .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--jade); text-transform:uppercase; letter-spacing:.1em; margin-bottom:6px;}
+.book-card h4{font-size:16px; margin-bottom:6px; color:var(--paper);}
+.book-card .author{font-size:12px; color:var(--paper-dim); margin-bottom:10px;}
+.book-card p{font-size:14px; color:#D9D2C4; margin:0;}
+
+/* calculator */
+.calc{
+  background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:26px;
+  margin:22px 0 34px;
+}
+.calc-head{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+.calc-head .icon{width:30px;height:30px;border-radius:8px;background:var(--surface-2); display:flex;align-items:center;justify-content:center; color:var(--gold-bright); font-size:15px;}
+.calc-head h4{font-size:17px; margin:0; color:var(--paper);}
+.calc-sub{font-size:13px; color:var(--paper-dim); margin-bottom:18px;}
+.calc-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+@media(max-width:560px){.calc-grid{grid-template-columns:1fr;}}
+.field label{display:block; font-size:12px; color:var(--paper-dim); margin-bottom:5px; text-transform:uppercase; letter-spacing:.06em;}
+.field .input-wrap{display:flex; align-items:center; background:var(--ink); border:1px solid var(--line); border-radius:8px; padding:0 12px;}
+.field .input-wrap span{color:var(--gold); font-size:14px; margin-right:4px;}
+.field input[type=number], .field input[type=range]{
+  background:transparent; border:none; outline:none; color:var(--ivory); font-family:'IBM Plex Mono',monospace;
+  font-size:15px; padding:10px 0; width:100%;
+}
+.field input[type=range]{padding:6px 0; accent-color:var(--gold);}
+.calc-result{
+  margin-top:20px; padding-top:18px; border-top:1px dashed var(--line);
+  display:flex; flex-wrap:wrap; gap:24px;
+}
+.result-stat .k{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--paper-dim);}
+.result-stat .v{font-family:'IBM Plex Mono',monospace; font-size:22px; color:var(--gold-bright); font-weight:600;}
+canvas.chart{width:100%; height:220px; margin-top:16px; display:block;}
+
+/* level badges strip */
+.badge-strip{display:flex; gap:10px; flex-wrap:wrap; margin:18px 0 30px;}
+.mini-badge{
+  display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--line);
+  border-radius:20px; padding:7px 14px 7px 8px; font-size:12.5px; color:var(--paper-dim);
+}
+.mini-badge .dotnum{width:20px;height:20px;border-radius:50%; background:var(--surface-2); color:var(--gold-bright); font-family:'IBM Plex Mono',monospace; font-size:11px; display:flex;align-items:center;justify-content:center;}
+
+/* checklist / lifestyle */
+.lifestyle-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:16px 0 30px;}
+@media(max-width:640px){.lifestyle-grid{grid-template-columns:1fr;}}
+.life-item{background:var(--surface-2); border-radius:10px; padding:16px 18px; border-top:2px solid var(--gold);}
+.life-item h5{margin:0 0 6px; font-size:14.5px; color:var(--paper); font-family:'Inter',sans-serif; font-weight:600;}
+.life-item p{margin:0; font-size:13.5px; color:var(--paper-dim);}
+
+/* quiz */
+.quiz-box{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:26px; margin:24px 0;}
+.quiz-q{margin-bottom:18px;}
+.quiz-q p{font-weight:600; color:var(--paper); margin-bottom:10px; font-size:15px;}
+.quiz-opts{display:flex; flex-direction:column; gap:8px;}
+.quiz-opts button{
+  text-align:left; background:var(--ink); border:1px solid var(--line); color:#D9D2C4;
+  padding:11px 14px; border-radius:8px; cursor:pointer; font-family:'Inter',sans-serif; font-size:14px; transition:all .15s;
+}
+.quiz-opts button:hover{border-color:var(--gold);}
+.quiz-opts button.picked{border-color:var(--gold); background:rgba(201,162,75,0.12); color:var(--gold-bright);}
+#quizResult{display:none; margin-top:18px; padding-top:18px; border-top:1px dashed var(--line); font-size:14.5px; color:var(--paper);}
+
+/* debt planner */
+.debt-row{display:grid; grid-template-columns:2fr 1fr 1fr auto; gap:10px; align-items:center; margin-bottom:10px;}
+@media(max-width:560px){.debt-row{grid-template-columns:1fr 1fr;}}
+.debt-row input{background:var(--ink); border:1px solid var(--line); color:var(--ivory); border-radius:6px; padding:8px 10px; font-family:'IBM Plex Mono',monospace; font-size:13px; width:100%;}
+.debt-row button.rm{background:transparent; border:none; color:var(--danger); cursor:pointer; font-size:16px;}
+.btn{background:var(--gold); color:var(--ink); border:none; padding:9px 16px; border-radius:8px; font-weight:600; cursor:pointer; font-size:13px; font-family:'Inter',sans-serif;}
+.btn.ghost{background:transparent; border:1px solid var(--gold); color:var(--gold-bright);}
+
+/* glossary */
+.gloss-search{
+  width:100%; background:var(--surface); border:1px solid var(--line); color:var(--ivory);
+  padding:14px 16px; border-radius:10px; font-size:15px; margin-bottom:24px; font-family:'Inter',sans-serif;
+}
+.gloss-search::placeholder{color:var(--paper-dim);}
+.gloss-grid{display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:10px; overflow:hidden;}
+@media(max-width:640px){.gloss-grid{grid-template-columns:1fr;}}
+.gloss-item{background:var(--surface); padding:16px 18px;}
+.gloss-item dt{font-family:'Fraunces',serif; color:var(--gold-bright); font-size:15px; margin-bottom:4px; font-weight:600;}
+.gloss-item dd{margin:0; font-size:13.5px; color:var(--paper-dim); line-height:1.5;}
+.gloss-cat{font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:var(--jade); margin-top:6px; display:block;}
+
+footer{text-align:center; padding:40px 24px; color:var(--paper-dim); font-size:12.5px; border-top:1px solid var(--line);}
+footer .disclaimer{max-width:600px; margin:0 auto 10px; line-height:1.6;}
+
+@media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important;} }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-row">
+    <div class="brand">
+      <div class="seal">M</div>
+      <div>
+        <h1>The Ledger</h1>
+        <div class="tag">Money Mastery, Level by Level · by Aryan Surender</div>
+      </div>
+    </div>
+    <div class="ticker">
+      <div class="label">If you'd invested with this ledger</div>
+      <div class="amount mono" id="tickerAmount">₹10,000</div>
+    </div>
+  </div>
+  <nav class="levels" id="levelNav">
+    <button data-level="1" class="active"><span class="dot"></span>1 · Foundations</button>
+    <button data-level="2"><span class="dot"></span>2 · Saving &amp; Earning</button>
+    <button data-level="3"><span class="dot"></span>3 · Investing &amp; Trading</button>
+    <button data-level="4"><span class="dot"></span>4 · Wealth Mastery</button>
+    <button data-level="5"><span class="dot"></span>5 · AI &amp; Money</button>
+    <button data-level="6"><span class="dot"></span>Glossary</button>
+  </nav>
+  <div class="progress-rail"><div class="progress-fill" id="progressFill"></div></div>
+</header>
+
+<main>
+
+<!-- ============ LEVEL 1 ============ -->
+<section class="level-section active" id="level-1">
+  <div class="level-header">
+    <div class="level-eyebrow">Level 1 of 5 · Foundations</div>
+    <h2>Before you can grow money, you have to understand what it actually is</h2>
+    <p class="dek">Every billionaire's fortune stands on the same first floor you're standing on right now. This level is about getting that floor completely solid.</p>
+  </div>
+
+  <div class="chapter">
+    <h3><span class="num">1.1</span> Money, income, and wealth are not the same thing</h3>
+    <p><strong>Income</strong> is what flows to you — a salary, a fee, a commission. <strong>Wealth</strong> is what you keep and what keeps working for you after the flow stops. Most people optimize their whole life for income and never build wealth, because the two require different skills: income rewards effort, wealth rewards ownership.</p>
+    <p>The clearest way to see this is through <span class="term" tabindex="0">assets and liabilities<span class="def">An asset is anything that puts money in your pocket over time. A liability is anything that takes money out of it — regardless of what it looks like on the surface.</span></span>. A car loan looks like progress but is a liability. A dividend-paying index fund looks boring but is an asset. Robert Kiyosaki's entire argument in <em>Rich Dad Poor Dad</em> reduces to one sentence: the rich buy assets, the poor and middle class buy liabilities they think are assets.</p>
+  </div>
+
+  <div class="card-row">
+    <div class="book-card">
+      <div class="eyebrow">Book Insight</div>
+      <h4>Rich Dad Poor Dad</h4>
+      <div class="author">Robert Kiyosaki</div>
+      <p>Your house is not an asset if it doesn't generate income — it's where your money lives, not where it works. Financial literacy means being able to tell the difference between the two at a glance, for every purchase you make.</p>
+    </div>
+    <div class="book-card">
+      <div class="eyebrow">Book Insight</div>
+      <h4>The Psychology of Money</h4>
+      <div class="author">Morgan Housel</div>
+      <p>Doing well with money has little to do with how smart you are and a lot to do with how you behave. A genius who panic-sells in a crash loses to an average person who just stays invested and calm.</p>
+    </div>
+  </div>
+
+  <div class="chapter">
+    <h3><span class="num">1.2</span> Budgeting: give every rupee a job before the month starts</h3>
+    <p>The <strong>50/30/20 rule</strong> is the simplest starting framework: 50% of take-home income to needs, 30% to wants, 20% to savings and debt repayment. It's a floor, not a ceiling — as your income grows, the goal is to grow the 20% far faster than the 30%.</p>
+    <p>A sharper version is <span class="term" tabindex="0">zero-based budgeting<span class="def">Every unit of income is assigned a specific job — spending, saving, or investing — until the total equals zero. Nothing sits around unassigned.</span></span>, where income minus every planned expense and every planned saving equals exactly zero. Nothing is left "floating," which is usually where money quietly disappears.</p>
+  </div>
+
+  <div class="calc">
+    <div class="calc-head"><div class="icon">₹</div><h4>Budget Allocator</h4></div>
+    <div class="calc-sub">Enter your monthly take-home income and see the 50/30/20 split.</div>
+    <div class="field">
+      <label>Monthly Take-Home Income</label>
+      <div class="input-wrap"><span>₹</span><input type="number" id="budgetIncome" value="50000" min="0"></div>
+    </div>
+    <div class="calc-result" id="budgetResult"></div>
+  </div>
+
+  <div class="chapter">
+    <h3><span class="num">1.3</span> Your credit score is a financial reputation</h3>
+    <p>A <span class="term" tabindex="0">credit score<span class="def">A numeric score (300–900 in India via CIBIL, 300–850 in the US via FICO) summarizing how reliably you repay borrowed money, built from your repayment history, credit usage, and credit age.</span></span> is built from your repayment history, how much of your available credit you use, and how long you've held credit accounts. It matters because it's the single number lenders use to decide your interest rate — a poor score doesn't just block loans, it makes every future loan more expensive, compounding against you the same way interest compounds for you.</p>
+    <ul>
+      <li>Pay every bill on time — payment history is the single largest factor.</li>
+      <li>Keep <span class="term" tabindex="0">credit utilization<span class="def">The percentage of your total available credit that you're currently using. Below 30% is generally considered healthy.</span></span> under 30% of your limit.</li>
+      <li>Don't close your oldest credit account — length of credit history counts in your favor.</li>
+    </ul>
+  </div>
+
+  <div class="chapter">
+    <h3><span class="num">1.4</span> Billionaire habit: frugality is not poverty, it's discipline</h3>
+    <p>The common thread across almost every self-made billionaire is that their spending never scaled with their wealth the way most people assume it would.</p>
+  </div>
+  <div class="badge-strip">
+    <div class="mini-badge"><span class="dotnum">W</span>Warren Buffett still lives in the Omaha house he bought in 1958</div>
+    <div class="mini-badge"><span class="dotnum">M</span>Mukesh Ambani still eats simple home-cooked meals daily, by his own account</div>
+    <div class="mini-badge"><span class="dotnum">I</span>Ingvar Kamprad (IKEA) flew economy and drove an old Volvo for decades</div>
+  </div>
+</section>
+
+<!-- ============ LEVEL 2 ============ -->
+<section class="level-section" id="level-2">
+  <div class="level-header">
+    <div class="level-eyebrow">Level 2 of 5 · Saving &amp; Earning</div>
+    <h2>Build the floor under you before you build the ladder up</h2>
+    <p class="dek">Saving without a system fails. Earning without direction plateaus. This level gives both a structure.</p>
+  </div>
+
+  <div class="chapter">
+    <h3><span class="num">2.1</span> The emergency fund: your insurance against your own bad luck</h3>
+    <p>An <span class="term" tabindex="0">emergency fund<span class="def">Cash set aside, in an easily accessible account, purely to cover unexpected expenses or income loss — not for spending or investing.</span></span> exists so a job loss or medical bill never forces you to sell investments at a bad time or go into high-interest debt. The standard target is 3–6 months of essential expenses, held in a place you can access within a day or two — not locked in investments.</p>
+  </div>
+  <div class="calc">
+    <div class="calc-head"><div class="icon">🛟</div><h4>Emergency Fund Calculator</h4></div>
+    <div class="calc-sub">Based on your essential monthly expenses.</div>
+    <div class="calc-grid">
+      <div class="field">
+        <label>Essential Monthly Expenses</label>
+        <div class="input-wrap"><span>₹</span><input type="number" id="efExpenses" value="25000" min="0"></div>
+      </div>
+      <div class="field">
+        <label>Months of Cover Desired: <span id="efMonthsLabel">6</span></label>
+        <input type="range" id="efMonths" min="3" max="12" value="6">
+      </div>
+    </div>
+    <div class="calc-result" id="efResult"></div>
+  </div>
+
+  <div class="chapter">
+    <h3><span class="num">2.2</span> Fixed Deposits: the floor of safe saving</h3>
+    <p>A <span class="term" tabindex="0">Fixed Deposit (FD)<span class="def">A lump sum deposited with a bank for a fixed period at a fixed interest rate, higher than a regular savings account, with a penalty for early withdrawal.</span></span> pays a guaranteed rate for a fixed <span class="term" tabindex="0">tenure<span class="def">The agreed length of time your money stays deposited before it matures and can be withdrawn without penalty.</span></span>, regardless of what markets do. It won't make you rich, but it's one of the few places your <span class="term" tabindex="0">principal<span class="def">The original sum of money deposited or invested, before any interest or returns are added.</span></span> genuinely cannot fall in nominal terms — the tradeoff is that if the interest rate is below <span class="term" tabindex="0">inflation<span class="def">The rate at which prices rise over time, eroding the purchasing power of money that isn't growing at least as fast.</span></span>, your money still loses real purchasing power even while the number on the statement grows.</p>
+    <p><strong>FD laddering</strong> — splitting one lump sum across several FDs with staggered maturity dates — solves the "my money is locked up" problem: something matures every few months, giving you liquidity without giving up the higher fixed rate on the rest.</p>
+  </div>
+  <div class="calc">
+    <div class="calc-head"><div class="icon">🏦</div><h4>Fixed Deposit Calculator</h4></div>
+    <div class="calc-sub">See your FD maturity value versus what inflation quietly takes back.</div>
+    <div class="calc-grid">
+      <div class="field"><label>Principal Amount</label><div class="input-wrap"><span>₹</span><input type="number" id="fdPrincipal" value="100000" min="0"></div></div>
+      <div class="field"><label>Annual Interest Rate</label><div class="input-wrap"><input type="number" id="fdRate" value="7" min="0" step="0.1"><span>%</span></div></div>
+      <div class="field"><label>Tenure (Years)</label><div class="input-wrap"><input type="number" id="fdYears" value="5" min="1"><span>yr</span></div></div>
+      <div class="field"><label>Assumed Inflation Rate</label><div class="input-wrap"><input type="number" id="fdInflation" value="6" min="0" step="0.1"><span>%</span></div></div>
+    </div>
+    <div class="calc-result" id="fdResult"></div>
+  </div>
+
+  <div class="chapter">
+    <h3><span class="num">2.3</span> Good debt, bad debt, and how to kill the bad kind</h3>
+    <p><strong>Good debt</strong> finances an appreciating asset or your own earning power — a reasonable education loan, a mortgage on a home you can afford. <strong>Bad debt</strong> finances depreciating consumption at a high interest rate — most credit card debt and consumer loans. The distinction that matters isn't the label on the loan, it's whether the money borrowed is working to make you more money than the <span class="term" tabindex="0">interest rate<span class="def">The cost of borrowing money, expressed as a percentage of the loan per year.</span></span> is costing you.</p>
+    <p>Two standard payoff strategies: the <strong>avalanche method</strong> (pay minimums everywhere, throw every extra rupee at the highest-interest debt first — mathematically optimal) and the <strong>snowball method</strong> (pay off the smallest balance first for a quick psychological win, then roll that payment into the next smallest — behaviorally easier to stick with).</p>
+  </div>
+  <div class="calc">
+    <div class="calc-head"><div class="icon">📋</div><h4>Debt Payoff Planner</h4></div>
+    <div class="calc-sub">Add your debts, then compare avalanche vs. snowball order.</div>
+    <div id="debtRows"></div>
+    <button class="btn ghost" id="addDebtBtn" type="button">+ Add a debt</button>
+    <div class="calc-result" id="debtResult"></div>
+  </div>
+
+  <div class="chapter">
+    <h3><span class="num">2.4</span> Insurance: financial management no one enjoys but everyone needs</h3>
+    <p><strong>Health insurance</strong> protects your savings from being wiped out by a single medical event. <strong>Term life insurance</strong> — pure protection with no investment component — replaces your income for dependents if you die during the policy term, and is far cheaper than investment-linked life policies for the same cover. A financial plan without insurance is a plan with a single point of failure.</p>
+  </div>
+
+  <div class="chapter">
+    <h3><span class="num">2.5</span> Multiple income streams: the billionaire default</h3>
+    <p><strong>Active income</strong> requires your ongoing time (a job, freelancing). <strong>Passive income</strong> keeps paying after the initial work is done (rental income, dividends, royalties, a business that runs without you). Almost every billionaire's fortune sits on a base of active income that was deliberately converted into ownership of assets that then produced passive income — the conversion, not the initial salary, is what built the fortune.</p>
+    <p><strong>Pay yourself first:</strong> move your saving and investing amount out of your account the moment income arrives, before any spending happens — treat it as the first bill you pay, not the leftover.</p>
+  </div>
+
+  <div class="card-row">
+    <div class="book-card">
+      <div class="eyebrow">Book Insight</div>
+      <h4>The Automatic Millionaire</h4>
+      <div class="author">David Bach</div>
+      <p>Automate the transfer to savings and investing so it happens without a decision each month. Willpower is unreliable; automation isn't. This single system change matters more than any budgeting app.</p>
+    </div>
+    <div class="book-card">
+      <div class="eyebrow">Book Insight</div>
+      <h4>The Millionaire Next Door</h4>
+      <div class="author">Thomas J. Stanley &amp; William D. Danko</div>
+      <p>Most actual millionaires live well below their means and drive ordinary cars — visible wealth and real wealth are usually inversely related, because spending on status is money that stops compounding.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LEVEL 3 ============ -->
+<section class="level-section" id="level-3">
+  <div class="level-header">
+    <div class="level-eyebrow">Level 3 of 5 · Investing &amp; Trading</div>
+    <h2>This is where money starts making money on its own</h2>
+    <p class="dek">Compounding, markets, and the sharp line between investing and trading — the level where most fortunes are actually built, and where most beginners lose money by confusing the two.</p>
+  </div>
+
+  <div class="chapter">
+    <h3><span class="num">3.1</span> Compound interest — Einstein and Buffett's "8th wonder"</h3>
+    <p><span class="term" tabindex="0">Compound interest<span class="def">Interest calculated on both your original principal and all previously earned interest — money earning money on its own money.</span></span> is simple interest's exponential cousin: instead of only earning returns on your original principal, you earn returns on your returns too. The gap between simple and compound growth looks small in year one and enormous by year twenty — this is the entire mathematical basis of long-term wealth building.</p>
+    <p>Warren Buffett made roughly 99% of his net worth <em>after</em> his 50th birthday. That isn't a coincidence — it's what happens when a high return rate is given enough decades to compound. Time in the market, not timing the market, is the single biggest lever most people have access to.</p>
+  </div>
+  <div class="calc">
+    <div class="calc-head"><div class="icon">📈</div><h4>Compound Interest Calculator</h4></div>
+    <div class="calc-sub">Watch the snowball effect — how much of the final number is growth, not your own money.</div>
+    <div class="calc-grid">
+      <div class="field"><label>Initial Principal</label><div class="input-wrap"><span>₹</span><input type="number" id="ciPrincipal" value="100000" min="0"></div></div>
+      <div class="field"><label>Annual Return Rate</label><div class="input-wrap"><input type="number" id="ciRate" value="12" min="0" step="0.1"><span>%</span></div></div>
+      <div class="field"><label>Years Invested</label><div class="input-wrap"><input type="number" id="ciYears" value="20" min="1"><span>yr</span></div></div>
+      <div class="field"><label>Compounding Frequency</label>
+        <select id="ciFreq" style="width:100%; background:var(--ink); border:1px solid var(--line); color:var(--ivory); padding:10px 12px; border-radius:8px; font-family:'IBM Plex Mono',monospace;">
+          <option value="1">Annually</option>
+          <option value="4">Quarterly</option>
+          <option value="12" selected>Monthly</option>
+        </select>
+      </div>
+    </div>
+    <div class="calc-result" id="ciResult"></div>
+    <canvas class="chart" id="ciChart"></canvas>
+  </div>
+
+  <div class="chapter">
+    <h3><span class="num">3.2</span> SIPs — compounding on autopilot</h3>
+    <p>A <span class="term" tabindex="0">SIP (Systematic Investment Plan)<span class="def">A fixed amount invested automatically at regular intervals — usually monthly — into an investment such as a mutual fund, regardless of market conditions.</span></span> invests a fixed amount at regular intervals, which does two things at once: it forces the "pay yourself first" habit, and it captures <span class="term" tabindex="0">rupee-cost averaging<span class="def">Buying a fixed rupee amount of an investment on a schedule means you automatically buy more units when prices are low and fewer when prices are high, lowering your average cost over time.</span></span> — automatically buying more units when prices dip and fewer when they're expensive, without you having to guess the right moment.</p>
+  </div>
+  <div class="calc">
+    <div class="calc-head"><div class="icon">🔁</div><h4>SIP Growth Calculator</h4></div>
+    <div class="calc-sub">See how a monthly habit turns into a large number over time.</div>
+    <div class="calc-grid">
+      <div class="field"><label>Monthly Investment</label><div class="input-wrap"><span>₹</span><input type="number" id="sipAmount" value="5000" min="0"></div></div>
+      <div class="field"><label>Expected Annual Return</label><div class="input-wrap"><input type="number" id="sipRate" value="12" min="0" step="0.1"><span>%</span></div></div>
+      <div class="field"><label>Duration</label><div class="input-wrap"><input type="number" id="sipYears" value="15" min="1"><span>yr</span></div></div>
+    </div>
+    <div class="calc-result" id="sipResult"></div>
+    <canvas class="chart" id="sipChart"></canvas>
+  </div>
+
+  <div class="chapter">
+    <h3><span class="num">3.3</span> Investing vs. trading — same market, opposite games</h3>
+    <p><strong>Investing</strong> means buying ownership of something productive — a company, a fund, property — and holding it for years so its underlying growth and compounding work for you. <strong>Trading</strong> means buying and selling over short timeframes, trying to profit from price movements themselves rather than underlying growth. Trading demands constant attention, tight risk control, and accepts a much higher failure rate; most retail traders underperform a simple index fund over time, which is precisely why Buffett and Munger have spent decades publicly warning against treating markets as a casino.</p>
+    <p>If you do trade, the non-negotiables are: never risk more than a small, defined percentage of your capital on one trade, always use a <span class="term" tabindex="0">stop-loss<span class="def">A pre-set order to automatically sell a position if it falls to a certain price, capping your loss on that trade.</span></span>, and never trade with money you can't afford to lose — including, especially, borrowed money.</p>
+  </div>
+
+  <div class="card-row">
+    <div class="quote-card">
+      <p class="q">Price is what you pay. Value is what you get.</p>
+      <p class="who">Warren Buffett</p>
+      <p class="insight">The core of value investing: a stock's daily price and a business's actual worth are different things, and the gap between them is where long-term investors find opportunity.</p>
+    </div>
+    <div class="quote-card">
+      <p class="q">The big money is not in the buying or selling, but in the waiting.</p>
+      <p class="who">Charlie Munger</p>
+      <p class="insight">Munger's lifelong argument against overtrading — patience with a good asset usually outperforms activity.</p>
+    </div>
+  </div>
+
+  <div class="chapter">
+    <h3><span class="num">3.4</span> The building blocks: what you're actually buying</h3>
+    <ul>
+      <li><strong><span class="term" tabindex="0">Equity / Stocks<span class="def">A share representing partial ownership in a company. Its value rises and falls with the company's performance and market sentiment.</span></span>:</strong> ownership in a company; highest long-run growth potential, highest short-term <span class="term" tabindex="0">volatility<span class="def">How sharply and how often an investment's price swings up and down over time — a measure of risk and uncertainty, not of quality.</span></span>.</li>
+      <li><strong><span class="term" tabindex="0">Bonds<span class="def">A loan you make to a government or company, which pays you a fixed interest rate and returns your principal at a set maturity date.</span></span>:</strong> you're the lender, not the owner; steadier, lower returns, used to balance stock risk.</li>
+      <li><strong>Mutual funds / <span class="term" tabindex="0">Index funds<span class="def">A fund that simply holds all the stocks in a market index (like the Nifty 50 or S&P 500) in the same proportion, instead of trying to pick winners — low cost, broad diversification.</span></span>:</strong> pooled money professionally managed or, for index funds, passively tracking a whole market — instant <span class="term" tabindex="0">diversification<span class="def">Spreading investments across many different assets so that no single one's failure can seriously damage your overall portfolio.</span></span> without picking individual stocks.</li>
+      <li><strong>Real estate:</strong> tangible, can produce rental income, historically an inflation hedge, but illiquid and capital-intensive.</li>
+    </ul>
+    <p>Other terms worth knowing as you read a stock's numbers: <span class="term" tabindex="0">dividend<span class="def">A portion of a company's profit paid directly to shareholders, usually quarterly, separate from any change in share price.</span></span>, <span class="term" tabindex="0">P/E ratio<span class="def">Price-to-Earnings ratio: a stock's price divided by its earnings per share, used as a rough gauge of whether a stock is expensive or cheap relative to its profits.</span></span>, <span class="term" tabindex="0">bull market<span class="def">A sustained period of rising prices and investor optimism.</span></span>, and <span class="term" tabindex="0">bear market<span class="def">A sustained period of falling prices and investor pessimism, typically defined as a 20%+ drop from a recent high.</span></span>.</p>
+  </div>
+
+  <div class="card-row">
+    <div class="book-card">
+      <div class="eyebrow">Book Insight</div>
+      <h4>The Intelligent Investor</h4>
+      <div class="author">Benjamin Graham</div>
+      <p>Buy with a <span class="term" tabindex="0">margin of safety<span class="def">Buying an asset for meaningfully less than your estimate of its true worth, so you're protected if your judgment turns out to be wrong.</span></span> — a big enough gap between price and true value that you're protected even if you're wrong. Treat "Mr. Market" as a moody business partner offering you a price every day, not a verdict you must obey.</p>
+    </div>
+    <div class="book-card">
+      <div class="eyebrow">Book Insight</div>
+      <h4>The Compound Effect</h4>
+      <div class="author">Darren Hardy</div>
+      <p>Small, unglamorous, consistent decisions compound the same way money does. The daily choices no one applauds are the ones that actually determine the outcome ten years out.</p>
+    </div>
+  </div>
+
+  <div class="chapter">
+    <h3><span class="num">3.5</span> Munger's mental models, applied to money</h3>
+    <ul>
+      <li><strong><span class="term" tabindex="0">Circle of competence<span class="def">The set of businesses, industries, or ideas you genuinely understand well enough to judge — investing outside it means you're guessing, not analyzing.</span></span>:</strong> only invest in what you actually understand. Not knowing is fine; pretending to know is expensive.</li>
+      <li><strong>Inversion:</strong> instead of only asking "how do I get rich," also ask "how do people go broke" — and avoid doing those things (excess leverage, no emergency fund, chasing hot tips).</li>
+      <li><strong>Diversification as humility:</strong> spreading bets across assets is an admission that you can't predict the future with certainty — and neither can anyone else.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ LEVEL 4 ============ -->
+<section class="level-section" id="level-4">
+  <div class="level-header">
+    <div class="level-eyebrow">Level 4 of 5 · Wealth Mastery</div>
+    <h2>Turning a growing number into a durable fortune and a life</h2>
+    <p class="dek">This level is about the long game: tracking your true position, planning decades ahead, and adopting the mindset that sits underneath every billionaire playbook.</p>
+  </div>
+
+  <div class="chapter">
+    <h3><span class="num">4.1</span> Net worth: the one number that actually measures wealth</h3>
+    <p><span class="term" tabindex="0">Net worth<span class="def">Total assets minus total liabilities — everything you own of value, minus everything you owe.</span></span> = total assets − total liabilities. Not your salary, not your job title — this is the real scoreboard, and the only one billionaires actually track over decades.</p>
+  </div>
+  <div class="calc">
+    <div class="calc-head"><div class="icon">⚖️</div><h4>Net Worth Tracker</h4></div>
+    <div class="calc-sub">List what you own and what you owe.</div>
+    <div class="calc-grid">
+      <div class="field"><label>Total Assets (cash, investments, property, etc.)</label><div class="input-wrap"><span>₹</span><input type="number" id="nwAssets" value="500000" min="0"></div></div>
+      <div class="field"><label>Total Liabilities (loans, credit card debt, etc.)</label><div class="input-wrap"><span>₹</span><input type="number" id="nwLiab" value="150000" min="0"></div></div>
+    </div>
+    <div class="calc-result" id="nwResult"></div>
+  </div>
+
+  <div class="chapter">
+    <h3><span class="num">4.2</span> Retirement: compounding needs a head start more than a big check</h3>
+    <p>Because compounding is exponential, starting ten years earlier usually beats contributing twice as much ten years later. The person who starts at 25 investing a moderate amount typically ends up with more at 60 than the person who starts at 35 investing considerably more — the extra decade of compounding does work that money alone can't buy back.</p>
+  </div>
+
+  <div class="chapter">
+    <h3><span class="num">4.3</span> Thinking about tax efficiently (concepts, not advice)</h3>
+    <p>Two ideas worth understanding, independent of your country's specific rules: your <span class="term" tabindex="0">tax bracket<span class="def">The rate at which your next unit of income is taxed — most systems tax income in bands, so your whole income usually isn't taxed at your highest rate.</span></span> is usually a marginal rate on your next rupee earned, not your whole income; and <span class="term" tabindex="0">capital gains<span class="def">The profit made from selling an investment for more than you paid for it, often taxed differently — and usually more favorably when held long-term — than regular income.</span></span> are frequently taxed differently, and more favorably the longer you hold the asset, which is one more structural reason long-term investing tends to beat short-term trading after tax.</p>
+  </div>
+
+  <div class="chapter">
+    <h3><span class="num">4.4</span> The Billionaire Playbook</h3>
+  </div>
+  <div class="card-row">
+    <div class="quote-card">
+      <p class="q">It's not how much money you make, but how much money you keep, how hard it works for you, and how many generations you keep it for.</p>
+      <p class="who">Robert Kiyosaki</p>
+      <p class="insight">Reframes wealth as a retention and duration problem, not just an earning problem.</p>
+    </div>
+    <div class="quote-card">
+      <p class="q">Someone's sitting in the shade today because someone planted a tree a long time ago.</p>
+      <p class="who">Warren Buffett</p>
+      <p class="insight">The clearest one-line case for starting to invest now, however small, rather than waiting for a "better" moment.</p>
+    </div>
+  </div>
+  <div class="lifestyle-grid">
+    <div class="life-item"><h5>Buffett — read relentlessly</h5><p>Reportedly spends roughly 80% of his working day reading — reports, filings, newspapers. Continuous, unglamorous learning is treated as a core job function, not a hobby.</p></div>
+    <div class="life-item"><h5>Munger — build a latticework of models</h5><p>Deliberately studied psychology, economics, and history together, not just finance, so decisions get checked from multiple angles before capital moves.</p></div>
+    <div class="life-item"><h5>Ambani — routine over impulse</h5><p>Known for a highly disciplined, early-starting daily routine — consistency in the unglamorous daily inputs, not sporadic bursts of effort.</p></div>
+    <div class="life-item"><h5>Gates &amp; Buffett — the Giving Pledge</h5><p>Both committed the majority of their fortunes to philanthropy. Their stated view: wealth beyond what's genuinely useful to your family is better deployed solving large problems than sitting idle.</p></div>
+  </div>
+
+  <div class="card-row">
+    <div class="book-card">
+      <div class="eyebrow">Book Insight</div>
+      <h4>Think and Grow Rich</h4>
+      <div class="author">Napoleon Hill</div>
+      <p>A "definiteness of purpose" — a specific, written financial goal with a plan and a deadline — consistently separates people who accumulate wealth from people who merely intend to.</p>
+    </div>
+    <div class="book-card">
+      <div class="eyebrow">Book Insight</div>
+      <h4>The Psychology of Money</h4>
+      <div class="author">Morgan Housel</div>
+      <p>The highest form of wealth is the ability to wake up and say "I can do whatever I want today" — money's real dividend is control over your own time, not the number itself.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LEVEL 5 ============ -->
+<section class="level-section" id="level-5">
+  <div class="level-header">
+    <div class="level-eyebrow">Level 5 of 5 · AI &amp; Money</div>
+    <h2>The newest lever on the oldest game</h2>
+    <p class="dek">Every previous level still applies — AI doesn't replace financial fundamentals, it changes how fast and how precisely you can act on them.</p>
+  </div>
+
+  <div class="chapter">
+    <h3><span class="num">5.1</span> How AI is already reshaping finance</h3>
+    <ul>
+      <li><strong><span class="term" tabindex="0">Robo-advisors<span class="def">Automated platforms that build and manage an investment portfolio for you based on your goals and risk tolerance, using algorithms instead of a human advisor.</span></span>:</strong> automatically build and rebalance diversified portfolios based on your goals and risk tolerance, at a fraction of a traditional advisor's fee.</li>
+      <li><strong>Algorithmic trading:</strong> funds use models to execute trades in milliseconds based on patterns — this is now most of the daily volume on major exchanges, which is part of why short-term retail trading against these systems is so difficult.</li>
+      <li><strong>Fraud detection:</strong> banks use machine learning to flag unusual transaction patterns in real time, catching fraud far faster than manual review ever could.</li>
+      <li><strong>Personalized planning:</strong> AI tools can analyze your actual spending and cash flow patterns and suggest a budget tailored to your real behavior instead of a generic template.</li>
+    </ul>
+  </div>
+
+  <div class="chapter">
+    <h3><span class="num">5.2</span> Practical ways to put AI to work on your own money</h3>
+    <ul>
+      <li><strong>Budgeting &amp; expense tracking:</strong> AI-powered banking apps auto-categorize spending and flag unusual charges or creeping subscriptions you've forgotten about.</li>
+      <li><strong>Research, not decisions:</strong> use AI to summarize company filings, explain unfamiliar financial terms, or compare products (like FD rates across banks) fast — then verify anything material before acting, since AI can be wrong or out of date.</li>
+      <li><strong>Automating the boring parts:</strong> automated round-up savings, auto-SIP scheduling, and bill-pay reminders remove the willpower requirement from good habits — the same principle as "pay yourself first," executed by software.</li>
+      <li><strong>Portfolio monitoring:</strong> AI tools can flag when your actual asset allocation has drifted from your target and needs rebalancing, something that's easy to forget to check manually.</li>
+    </ul>
+  </div>
+
+  <div class="chapter">
+    <h3><span class="num">5.3</span> The caveats no one skips</h3>
+    <p>AI-driven trading tools and "signal" services are marketed aggressively to beginners, but the same rules from Level 3 still apply: past performance shown in a slick backtest doesn't guarantee future results, and a tool making the decision faster doesn't make it more correct — it can just lose your money faster too. Treat any AI investment tool the way Graham treated the market itself: useful information, never a command to obey without your own judgment.</p>
+  </div>
+
+  <div class="chapter">
+    <h3><span class="num">5.4</span> How major funds actually use it today</h3>
+    <p>Large institutional investors increasingly use AI for pattern recognition across huge datasets (sentiment analysis on earnings calls, satellite imagery of retail parking lots, supply-chain signals) to inform — not replace — decisions still ultimately made against the same fundamentals covered in Level 3: value, risk, and margin of safety. The technology changed the speed and scale of research; it didn't change what a good investment actually is.</p>
+  </div>
+</section>
+
+<!-- ============ LEVEL 6: GLOSSARY ============ -->
+<section class="level-section" id="level-6">
+  <div class="level-header">
+    <div class="level-eyebrow">Reference</div>
+    <h2>The Master Glossary</h2>
+    <p class="dek">Every key term from every level, in one searchable place.</p>
+  </div>
+  <input type="text" class="gloss-search" id="glossSearch" placeholder="Search a term — e.g. 'compound', 'dividend', 'FD'…">
+  <div class="gloss-grid" id="glossGrid"></div>
+</section>
+
+</main>
+
+<footer>
+  <p class="disclaimer">The Ledger is an educational tool for learning financial concepts. It is not personalized financial, tax, legal, or investment advice, and all calculators use simplified assumptions. Quotes are paraphrased summaries of publicly known views, not verbatim citations. Please consult a qualified professional before making financial decisions.</p>
+  <p>Created by <strong style="color:var(--gold-bright); font-weight:600;">Aryan Surender</strong></p>
+</footer>
+
+<script>
+/* ================= NAVIGATION ================= */
+const levelButtons = document.querySelectorAll('#levelNav button');
+const sections = document.querySelectorAll('.level-section');
+let maxVisited = 1;
+
+function showLevel(n){
+  sections.forEach(s => s.classList.remove('active'));
+  document.getElementById('level-'+n).classList.add('active');
+  levelButtons.forEach(b => b.classList.toggle('active', b.dataset.level == n));
+  if(n <= 5){
+    maxVisited = Math.max(maxVisited, parseInt(n));
+    for(let i=1;i<=5;i++){
+      const btn = document.querySelector(`#levelNav button[data-level="${i}"]`);
+      if(i < maxVisited) btn.classList.add('done'); 
+    }
+    document.getElementById('progressFill').style.width = (maxVisited/5*100)+'%';
+  }
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+levelButtons.forEach(b => b.addEventListener('click', () => showLevel(b.dataset.level)));
+
+/* ================= HEADER TICKER (illustrative compounding of ₹10,000) ================= */
+let tickerBase = 10000, tickerYears = 0;
+function pulseTicker(){
+  tickerYears += 0.4;
+  const val = tickerBase * Math.pow(1 + 0.12/12, tickerYears*12);
+  const el = document.getElementById('tickerAmount');
+  el.textContent = '₹' + Math.round(val).toLocaleString('en-IN');
+  el.classList.add('grew');
+  setTimeout(()=>el.classList.remove('grew'), 600);
+  if(tickerYears >= 25) tickerYears = 0;
+}
+setInterval(pulseTicker, 1400);
+
+/* ================= HELPERS ================= */
+const fmt = n => '₹' + Math.round(n).toLocaleString('en-IN');
+function drawLineChart(canvas, dataPoints, labelEvery){
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.clientWidth, h = 220;
+  canvas.width = w*dpr; canvas.height = h*dpr;
+  ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,w,h);
+  const max = Math.max(...dataPoints);
+  const pad = {l:60,r:16,t:16,b:26};
+  const plotW = w - pad.l - pad.r, plotH = h - pad.t - pad.b;
+  // grid
+  ctx.strokeStyle = 'rgba(237,230,214,0.1)';
+  ctx.lineWidth = 1;
+  for(let i=0;i<=4;i++){
+    const y = pad.t + plotH - (plotH*i/4);
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(w-pad.r,y); ctx.stroke();
+    ctx.fillStyle = '#8a8272'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='right';
+    ctx.fillText(fmt(max*i/4), pad.l-8, y+4);
+  }
+  // line
+  ctx.beginPath();
+  dataPoints.forEach((v,i)=>{
+    const x = pad.l + (plotW * i/(dataPoints.length-1));
+    const y = pad.t + plotH - (plotH * v/max);
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  const grad = ctx.createLinearGradient(0,0,w,0);
+  grad.addColorStop(0,'#5C9179'); grad.addColorStop(1,'#C9A24B');
+  ctx.strokeStyle = grad; ctx.lineWidth = 2.5; ctx.stroke();
+  // fill
+  ctx.lineTo(pad.l+plotW, pad.t+plotH); ctx.lineTo(pad.l, pad.t+plotH); ctx.closePath();
+  ctx.fillStyle = 'rgba(92,145,121,0.12)'; ctx.fill();
+  // x labels
+  ctx.fillStyle = '#8a8272'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='center';
+  dataPoints.forEach((v,i)=>{
+    if(i % labelEvery === 0 || i === dataPoints.length-1){
+      const x = pad.l + (plotW * i/(dataPoints.length-1));
+      ctx.fillText('Yr '+i, x, h-6);
+    }
+  });
+}
+
+/* ================= BUDGET ALLOCATOR ================= */
+function updateBudget(){
+  const income = parseFloat(document.getElementById('budgetIncome').value)||0;
+  document.getElementById('budgetResult').innerHTML = `
+    <div class="result-stat"><div class="k">Needs (50%)</div><div class="v">${fmt(income*0.5)}</div></div>
+    <div class="result-stat"><div class="k">Wants (30%)</div><div class="v">${fmt(income*0.3)}</div></div>
+    <div class="result-stat"><div class="k">Save &amp; Invest (20%)</div><div class="v">${fmt(income*0.2)}</div></div>
+  `;
+}
+document.getElementById('budgetIncome').addEventListener('input', updateBudget);
+
+/* ================= EMERGENCY FUND ================= */
+function updateEF(){
+  const exp = parseFloat(document.getElementById('efExpenses').value)||0;
+  const months = parseInt(document.getElementById('efMonths').value);
+  document.getElementById('efMonthsLabel').textContent = months;
+  document.getElementById('efResult').innerHTML = `
+    <div class="result-stat"><div class="k">Target Fund Size</div><div class="v">${fmt(exp*months)}</div></div>
+    <div class="result-stat"><div class="k">At ₹5,000/month saved</div><div class="v">${Math.ceil((exp*months)/5000)} months to build</div></div>
+  `;
+}
+document.getElementById('efExpenses').addEventListener('input', updateEF);
+document.getElementById('efMonths').addEventListener('input', updateEF);
+
+/* ================= FD CALCULATOR ================= */
+function updateFD(){
+  const p = parseFloat(document.getElementById('fdPrincipal').value)||0;
+  const r = parseFloat(document.getElementById('fdRate').value)||0;
+  const y = parseFloat(document.getElementById('fdYears').value)||0;
+  const infl = parseFloat(document.getElementById('fdInflation').value)||0;
+  const maturity = p * Math.pow(1 + r/400, 4*y); // quarterly compounding, typical for FDs
+  const realValue = maturity / Math.pow(1+infl/100, y);
+  document.getElementById('fdResult').innerHTML = `
+    <div class="result-stat"><div class="k">Maturity Value</div><div class="v">${fmt(maturity)}</div></div>
+    <div class="result-stat"><div class="k">Interest Earned</div><div class="v">${fmt(maturity-p)}</div></div>
+    <div class="result-stat"><div class="k">Real Value (after inflation)</div><div class="v">${fmt(realValue)}</div></div>
+  `;
+}
+['fdPrincipal','fdRate','fdYears','fdInflation'].forEach(id => document.getElementById(id).addEventListener('input', updateFD));
+
+/* ================= DEBT PLANNER ================= */
+let debtCount = 0;
+function addDebtRow(name='', balance='', rate=''){
+  debtCount++;
+  const id = 'debt'+debtCount;
+  const div = document.createElement('div');
+  div.className = 'debt-row';
+  div.id = id;
+  div.innerHTML = `
+    <input type="text" placeholder="Debt name" value="${name}" class="dName">
+    <input type="number" placeholder="Balance ₹" value="${balance}" class="dBalance">
+    <input type="number" placeholder="Rate %" value="${rate}" class="dRate">
+    <button class="rm" type="button" onclick="document.getElementById('${id}').remove(); updateDebt();">✕</button>
+  `;
+  document.getElementById('debtRows').appendChild(div);
+  div.querySelectorAll('input').forEach(inp => inp.addEventListener('input', updateDebt));
+}
+document.getElementById('addDebtBtn').addEventListener('click', ()=>addDebtRow());
+function updateDebt(){
+  const rows = document.querySelectorAll('.debt-row');
+  const debts = Array.from(rows).map(r=>({
+    name: r.querySelector('.dName').value || 'Debt',
+    balance: parseFloat(r.querySelector('.dBalance').value)||0,
+    rate: parseFloat(r.querySelector('.dRate').value)||0
+  })).filter(d=>d.balance>0);
+  if(debts.length===0){ document.getElementById('debtResult').innerHTML=''; return; }
+  const avalanche = [...debts].sort((a,b)=>b.rate-a.rate).map(d=>d.name).join(' → ');
+  const snowball = [...debts].sort((a,b)=>a.balance-b.balance).map(d=>d.name).join(' → ');
+  const total = debts.reduce((s,d)=>s+d.balance,0);
+  document.getElementById('debtResult').innerHTML = `
+    <div class="result-stat" style="flex-basis:100%"><div class="k">Total Debt</div><div class="v">${fmt(total)}</div></div>
+    <div class="result-stat" style="flex-basis:100%"><div class="k">Avalanche Order (highest rate first)</div><div class="v" style="font-size:14px">${avalanche}</div></div>
+    <div class="result-stat" style="flex-basis:100%"><div class="k">Snowball Order (smallest balance first)</div><div class="v" style="font-size:14px">${snowball}</div></div>
+  `;
+}
+addDebtRow('Credit Card', 40000, 36);
+addDebtRow('Personal Loan', 120000, 14);
+
+/* ================= COMPOUND INTEREST ================= */
+function updateCI(){
+  const p = parseFloat(document.getElementById('ciPrincipal').value)||0;
+  const r = parseFloat(document.getElementById('ciRate').value)||0;
+  const y = parseInt(document.getElementById('ciYears').value)||1;
+  const n = parseInt(document.getElementById('ciFreq').value);
+  const points = [];
+  for(let yr=0; yr<=y; yr++){
+    points.push(p * Math.pow(1 + r/100/n, n*yr));
+  }
+  const final = points[points.length-1];
+  document.getElementById('ciResult').innerHTML = `
+    <div class="result-stat"><div class="k">Final Amount</div><div class="v">${fmt(final)}</div></div>
+    <div class="result-stat"><div class="k">Your Principal</div><div class="v">${fmt(p)}</div></div>
+    <div class="result-stat"><div class="k">Growth From Compounding</div><div class="v">${fmt(final-p)}</div></div>
+  `;
+  drawLineChart(document.getElementById('ciChart'), points, Math.ceil(y/8)||1);
+}
+['ciPrincipal','ciRate','ciYears','ciFreq'].forEach(id => document.getElementById(id).addEventListener('input', updateCI));
+
+/* ================= SIP ================= */
+function updateSIP(){
+  const m = parseFloat(document.getElementById('sipAmount').value)||0;
+  const r = parseFloat(document.getElementById('sipRate').value)||0;
+  const y = parseInt(document.getElementById('sipYears').value)||1;
+  const monthlyRate = r/100/12;
+  const points = [];
+  for(let yr=0; yr<=y; yr++){
+    const months = yr*12;
+    let fv = 0;
+    if(monthlyRate>0){
+      fv = m * ((Math.pow(1+monthlyRate, months) - 1)/monthlyRate) * (1+monthlyRate);
+    } else { fv = m*months; }
+    points.push(fv);
+  }
+  const final = points[points.length-1];
+  const invested = m*12*y;
+  document.getElementById('sipResult').innerHTML = `
+    <div class="result-stat"><div class="k">Maturity Value</div><div class="v">${fmt(final)}</div></div>
+    <div class="result-stat"><div class="k">Total Invested</div><div class="v">${fmt(invested)}</div></div>
+    <div class="result-stat"><div class="k">Wealth Gained</div><div class="v">${fmt(final-invested)}</div></div>
+  `;
+  drawLineChart(document.getElementById('sipChart'), points, Math.ceil(y/8)||1);
+}
+['sipAmount','sipRate','sipYears'].forEach(id => document.getElementById(id).addEventListener('input', updateSIP));
+
+/* ================= NET WORTH ================= */
+function updateNW(){
+  const a = parseFloat(document.getElementById('nwAssets').value)||0;
+  const l = parseFloat(document.getElementById('nwLiab').value)||0;
+  document.getElementById('nwResult').innerHTML = `
+    <div class="result-stat"><div class="k">Net Worth</div><div class="v">${fmt(a-l)}</div></div>
+    <div class="result-stat"><div class="k">Debt-to-Asset Ratio</div><div class="v">${a>0 ? ((l/a)*100).toFixed(1) : '0'}%</div></div>
+  `;
+}
+['nwAssets','nwLiab'].forEach(id => document.getElementById(id).addEventListener('input', updateNW));
+
+/* ================= GLOSSARY ================= */
+const glossary = [
+  ['Income','Money that flows to you regularly, such as a salary, fee, or commission.','Foundations'],
+  ['Wealth','What you keep and what keeps working for you after income stops.','Foundations'],
+  ['Asset','Anything that puts money in your pocket over time.','Foundations'],
+  ['Liability','Anything that takes money out of your pocket over time.','Foundations'],
+  ['Net Worth','Total assets minus total liabilities.','Mastery'],
+  ['Inflation','The rate at which prices rise over time, eroding purchasing power.','Foundations'],
+  ['Zero-Based Budgeting','A budget where every unit of income is assigned a job until the total equals zero.','Foundations'],
+  ['Credit Score','A numeric score summarizing how reliably you repay borrowed money.','Foundations'],
+  ['Credit Utilization','The percentage of your available credit currently in use.','Foundations'],
+  ['Emergency Fund','Cash set aside purely to cover unexpected expenses or income loss.','Saving'],
+  ['Fixed Deposit (FD)','A lump sum deposited for a fixed period at a fixed, guaranteed interest rate.','Saving'],
+  ['Tenure','The agreed length of time money stays deposited or invested.','Saving'],
+  ['Principal','The original sum of money deposited or invested, before interest or returns.','Saving'],
+  ['Interest Rate','The cost of borrowing money, or the return on lending/depositing it, per year.','Saving'],
+  ['APR','Annual Percentage Rate — the yearly cost of a loan including fees, expressed as a percentage.','Saving'],
+  ['EMI','Equated Monthly Installment — a fixed monthly payment used to repay a loan over time.','Saving'],
+  ['Good Debt','Debt used to finance an appreciating asset or your own earning power.','Saving'],
+  ['Bad Debt','Debt used to finance depreciating consumption, often at a high interest rate.','Saving'],
+  ['Avalanche Method','Paying off the highest-interest debt first while making minimum payments elsewhere.','Saving'],
+  ['Snowball Method','Paying off the smallest debt balance first for psychological momentum.','Saving'],
+  ['Active Income','Income that requires your ongoing time and effort to earn.','Saving'],
+  ['Passive Income','Income that continues after the initial work is done.','Saving'],
+  ['Compound Interest','Interest calculated on both principal and previously earned interest.','Investing'],
+  ['Simple Interest','Interest calculated only on the original principal.','Investing'],
+  ['SIP','Systematic Investment Plan — a fixed amount invested automatically at regular intervals.','Investing'],
+  ['Rupee-Cost Averaging','Buying more units when prices are low and fewer when high, by investing a fixed amount on schedule.','Investing'],
+  ['Equity / Stock','A share representing partial ownership in a company.','Investing'],
+  ['Bond','A loan you make to a government or company in exchange for fixed interest.','Investing'],
+  ['Mutual Fund','A pooled investment professionally managed on behalf of many investors.','Investing'],
+  ['Index Fund','A fund that holds all stocks in a market index in the same proportion, passively.','Investing'],
+  ['Diversification','Spreading investments across many assets to limit the damage from any one failing.','Investing'],
+  ['Volatility','How sharply and often an investment price swings up and down.','Investing'],
+  ['Dividend','A portion of company profit paid directly to shareholders.','Investing'],
+  ['P/E Ratio','Price-to-Earnings ratio, a rough gauge of whether a stock is cheap or expensive.','Investing'],
+  ['Bull Market','A sustained period of rising prices and investor optimism.','Investing'],
+  ['Bear Market','A sustained period of falling prices, typically a 20%+ drop from a recent high.','Investing'],
+  ['Stop-Loss','A pre-set order to automatically sell a position if it falls to a certain price.','Investing'],
+  ['Margin of Safety','Buying an asset for meaningfully less than your estimate of its true worth.','Investing'],
+  ['Circle of Competence','The set of things you genuinely understand well enough to judge and invest in.','Investing'],
+  ['Capital Gains','Profit from selling an investment for more than you paid, often taxed favorably long-term.','Mastery'],
+  ['Tax Bracket','The rate at which your next unit of income is taxed.','Mastery'],
+  ['Robo-Advisor','An automated platform that builds and manages your portfolio using algorithms.','AI & Money'],
+];
+function renderGlossary(filter=''){
+  const grid = document.getElementById('glossGrid');
+  const f = filter.toLowerCase();
+  const items = glossary.filter(([term,def]) => term.toLowerCase().includes(f) || def.toLowerCase().includes(f));
+  grid.innerHTML = items.map(([term,def,cat]) => `
+    <div class="gloss-item">
+      <dt>${term}</dt>
+      <dd>${def}</dd>
+      <span class="gloss-cat">${cat}</span>
+    </div>
+  `).join('') || '<div class="gloss-item"><dd>No terms match your search.</dd></div>';
+}
+document.getElementById('glossSearch').addEventListener('input', e => renderGlossary(e.target.value));
+
+/* ================= INIT ================= */
+updateBudget(); updateEF(); updateFD(); updateDebt(); updateCI(); updateSIP(); updateNW(); renderGlossary();
+window.addEventListener('resize', ()=>{ updateCI(); updateSIP(); });
+</script>
+</body>
+</html>
